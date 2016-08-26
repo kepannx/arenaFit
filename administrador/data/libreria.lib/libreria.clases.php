@@ -1,0 +1,12 @@
+<?php 
+require("conexion.class.php");
+require("validacion.class.ingreso.php");
+require("literales.php");
+require("consultas.class.php");
+//require("ajax.class.php");
+require("ingresar.class.php");
+require("editar.class.php");
+//require("informes.class.php");
+//require("consulta.ajax.class.php");
+//require("documentos.class.php");
+?>
