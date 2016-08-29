@@ -52,13 +52,14 @@ require("../data/comunes/header.php");
         <div class="col-md-12 col-lg-12 dash-left">
           <div class="col-md-12">
             <div class="panel">
-            <form action="" method="POST" enctype="multipart/form-data">
+            <form action="" method="POST" id="clientForm" enctype="multipart/form-data">
             <?php
               
 
-              //require("../data/comunes/html/formularios/datosCliente.php");
+              
               if (!isset($confirmacion)) {
                 # code...
+                //require("../data/comunes/html/formularios/datosCliente.php");
                 require("../data/comunes/html/formularios/remision.php");
               }
               else
@@ -72,9 +73,31 @@ require("../data/comunes/header.php");
                 elseif ($confirmacion==1) {
                   # code...
                   //FACTURAR
+
                   $idPedido=$ingreso->ingresarPedidos($datos);
+
                   if (intval($idPedido)>0) {
                     # code...
+                    //Verifico si es un credito
+                    if($consulta->consultaDevuelta($valorTotal, $efectivo)<=0)
+                    {
+                      //Es un credito
+                      
+                      if($ingreso->ingresarCredito($idPedido, $efectivo)==1)
+                      {
+                          //echo "Credito hecho";
+                        
+                        $consulta->avisos("done", "Listo, ya quedó registrado, esta factura tiene un crédito abierto");
+                      }
+                      else
+                      {
+                        return "error al ingresar el crédito";
+                      }
+                    }
+                    else
+                    {
+                        //Es una venta común  
+                 
                     
                     echo '<div class="col-md-12" id="noPrint">
           <h1 align="center" class="text-danger">
@@ -83,6 +106,8 @@ require("../data/comunes/header.php");
 
 
                     $consulta->factura($idPedido, 1); //1:media carta  2:tirilla
+
+                  }
                      ?>
                      <br><br>
                      <div class="col-md-12" align="center">
@@ -117,12 +142,7 @@ require("../data/comunes/header.php");
           ?>
 
 
-          <div class="row">
-            <div class="col-sm-12" align="center">
-              <button class="btn btn-wide btn-primary btn-quirk mr5"> <i class="fa fa-save"></i> Guargalos</button>
-
-            </div>
-          </div>
+          
              </form>
           <!-- Control de Envios-->
           

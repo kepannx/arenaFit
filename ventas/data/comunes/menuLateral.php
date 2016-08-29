@@ -10,8 +10,8 @@
           </a>
         </div>
         <div class="media-body">
-          <h4 class="media-heading"><?php echo $consulta->filtroStrings($datosUser["nombres"],2); ?> </h4>
-          <span>Vendedor</span>
+          <h4 class="media-heading"><?php echo $consulta->filtroStrings($datosUser["nombre"],2); ?> </h4>
+          <span>Administrador</span>
         </div>
       </div><!-- leftpanel-profile -->
 
@@ -30,11 +30,19 @@
               <ul class="children">
                 <li><a href="<?php echo $validar->datospagina(5); ?>ventas/postTradicional.php?id=<?php echo $id; ?>">Post de Ventas</a></li>
                 <li><a href="<?php echo $validar->datospagina(5); ?>ventas/tusVentas.php?id=<?php echo $id; ?>">Tus Ventas</a></li>
+                <li><a href="<?php echo $validar->datospagina(5); ?>ventas/creditos.php?id=<?php echo $id; ?>">Creditos</a></li>
+
               </ul>
             </li>
 
-            
-            
+             <li class="nav-parent">
+              <a href=""><i class="fa fa-suitcase"></i> <span>Productos</span></a>
+              <ul class="children">
+                <li><a href="<?php echo $validar->datospagina(5); ?>productos/nuevo.php?id=<?php echo $id; ?>">Nuevo Producto</a></li>
+                <li><a href="<?php echo $validar->datospagina(5); ?>productos/lista.php?id=<?php echo $id; ?>">Lista de Productos</a></li>
+              
+              </ul>
+            </li>
 
 
 

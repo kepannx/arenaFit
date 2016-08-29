@@ -1,3 +1,57 @@
+<div class="panel-heading nopaddingbottom">
+                <h3> <i class="fa fa-shopping-cart"></i> Formulario de Pedido</h3>
+                <div role="alert" style="" class="gritter-item-wrapper with-icon exclamation-circle send-o success mb10">
+              
+              </div><!-- gritter-item-wrapper -->
+
+              <div class="panel-body nopaddingtop">
+                <hr>
+                
+              <h3><i class="fa fa-user"></i> Datos Del Cliente</h3>
+            
+              <hr>
+            
+                  <div class="form-group">
+                    <label class="col-sm-1 control-label">Identificación</label>
+                    <div class="col-sm-3">
+                     <h4 class="text-danger"><?php echo $identificacion ?></h4>
+                      <input type="hidden" name="identificacion" value="<?php echo $identificacion ?>">
+                    </div>
+
+
+                    <label class="col-sm-1 control-label">Nombre</label>
+                    <div class="col-sm-7">
+                      
+                      <h4 class="text-danger"><?php echo $nombresApellidos ?></h4>
+                      <input type="hidden" name="nombresApellidos" value="<?php echo $nombresApellidos ?>">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-1 control-label">Teléfonos</label>
+                    <div class="col-sm-3">
+                      <h4 class="text-danger"><?php echo $telefonos ?></h4>
+                      <input type="hidden" name="telefonos" value="<?php echo $telefonos ?>">
+
+                    </div>
+
+      
+                   <label class="col-sm-1 control-label">Email<span class="text-danger">*</span></label>
+                    <div class="col-sm-7">
+                     <h4 class="text-danger"><?php echo $email ?></h4>
+                      <input type="hidden" name="email" value="<?php echo $email ?>">
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="idCliente" id="idCliente" value="<?php echo $nuevoCliente; ?>">
+                  <hr>
+
+                  
+              </div><!-- panel-body -->
+
+
+
+
 <div class="panel-body nopaddingtop">
 <form action="" method="POST" enctype="multipart/form-data">
 <div class="row">

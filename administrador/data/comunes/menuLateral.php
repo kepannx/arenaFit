@@ -30,6 +30,8 @@
               <ul class="children">
                 <li><a href="<?php echo $validar->datospagina(5); ?>ventas/postTradicional.php?id=<?php echo $id; ?>">Post de Ventas</a></li>
                 <li><a href="<?php echo $validar->datospagina(5); ?>ventas/tusVentas.php?id=<?php echo $id; ?>">Tus Ventas</a></li>
+                <li><a href="<?php echo $validar->datospagina(5); ?>ventas/creditos.php?id=<?php echo $id; ?>">Creditos</a></li>
+
               </ul>
             </li>
 

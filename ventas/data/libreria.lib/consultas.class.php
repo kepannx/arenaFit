@@ -46,7 +46,7 @@ class consultas extends conectar {
   {
     conectar::conexiones();
     $id=$this->decrypt($id, publickey);
-    $sql = "SELECT * FROM empleados  where id='".$id."'";
+    $sql = "SELECT * FROM sa  where id='".$id."'";
     return mysql_query($sql);
     conectar::desconectar();
   }
@@ -140,6 +140,49 @@ public  function stringTipoCargo($parametro)
   }
 
 }
+
+
+
+//Datos de los clientes
+
+public  function datosCliente($idCliente, $vector)
+{
+  conectar::conexiones();
+   $sql="SELECT * FROM  clientes WHERE id='".intval($idCliente)."'";
+  $query=mysql_query($sql);
+  $rs=mysql_fetch_array($query);
+  switch ($vector) 
+    {
+      case "nombresApellidos":
+        # code...
+        return  $rs["nombresApellidos"];
+        break;
+
+
+      case "identificacion":
+        # code...
+        return  $rs["identificacion"];
+        break;
+
+      case "telefonos":
+        # code...
+        return  $rs["telefonos"];
+        break;
+
+
+      case "email":
+        # code...
+        return  $rs["email"];
+        break;
+
+
+  
+
+    }
+  conectar::desconectar();
+
+}
+
 
 
 
@@ -511,6 +554,19 @@ public  function factura($idFactura, $vector)
 
 
 
+
+public  function valorCreditos()
+{
+
+}
+
+
+
+
+
+
+
+//Consulta del valor devuelto
 public  function consultaDevuelta($valorTotal, $efectivo)
 {
   $efectivo=$this->filtroNumerico($this->normalizacionDeCaracteres($efectivo));
@@ -577,6 +633,70 @@ while ($rs=mysql_fetch_array($query)) {
                   <td>'.$rs["idCliente"].'</td>
                   <td>'.$this->fechaHumana(date("Y-m-d", $rs["fechaPedido"])).'</td>
                   <td>$'.number_format($rs["valorPedido"]).'</td>
+
+                  <td>
+                    <a href="'.$this->datospagina(5).'/ventas/detalleFactura.php?id='.$id.'&f='.$this->encrypt($rs["id"], publickey).'" >
+                      <button class="btn btn-primary">¿Necesitas Ver Mas Detalles?</button>
+                    </a>
+                      </td>
+                </tr>';
+}
+
+echo '</tbody>
+    </table>';
+
+
+}
+
+
+
+
+
+
+
+//Lista de Créditos
+public  function listaCreditos($id, $vector)
+{
+
+//[1]:Ventas del día actual [2]:Ventas del mes [3]:Fecha Seleccionada
+if ($vector==1) {
+  # code...
+  $sql="SELECT *  FROM creditos  WHERE fechaAbono BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)." ";
+  $query=mysql_query($sql);
+}
+elseif ($vector==2) {
+  # code...
+  //$sql="SELECT *  FROM pedidos WHERE fechaPedido BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)." ";
+}
+elseif ($vector==3) {
+  # code...
+  $fecha1=strtotime($_REQUEST["fecha1"]);
+  $fecha2=strtotime($_REQUEST["fecha2"]);
+  $sql="SELECT *  FROM pedidos WHERE fechaAbono BETWEEN ".$fecha1."  AND ".$fecha2."";
+  $query=mysql_query($sql);
+
+}
+
+  echo '<table id="dataTable1" class="table table-bordered table-striped-col">
+              <thead>
+                <tr>
+                  <th>Nro Factura</th>
+                  <th>Cliente</th>
+                  <th>Fecha</th>
+                  <th>Valor Factura</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>';
+
+
+while ($rs=mysql_fetch_array($query)) {
+  # code...
+  echo '<tr>
+                  <td>'.$this->datosFactura($rs["idFactura"], "nroPedido").'</td>
+                  <td>'.$this->datosCliente($this->datosFactura($rs["idFactura"], "idCliente"), "nombresApellidos").'</td>
+                  <td>'.$this->fechaHumana(date("Y-m-d", $this->datosFactura($rs["idFactura"], "fechaPedido"))).'</td>
+                  <td>$'.number_format($this->datosFactura($rs["idFactura"], "valorPedido")).'</td>
 
                   <td>
                     <a href="'.$this->datospagina(5).'/ventas/detalleFactura.php?id='.$id.'&f='.$this->encrypt($rs["id"], publickey).'" >

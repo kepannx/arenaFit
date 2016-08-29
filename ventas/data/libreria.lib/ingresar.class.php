@@ -56,6 +56,19 @@ public  function ingresarPedidos($parametros)
 {
 	conectar::conexiones();
 	extract($parametros);
+
+		
+
+		//verificacion del cliente
+		$idCliente=$this->verificacionCliente($identificacion);
+		if($idCliente==0)
+		{
+			//Creo cliente
+			$idCliente=$this->crearCliente($parametros);
+		}
+
+
+		//Ingereso del pedido
 		$num=sizeof($nombreArticulo);
         $control=0;
         $suma=0;
@@ -90,6 +103,115 @@ public  function ingresarPedidos($parametros)
 }
 
 
+
+
+
+//Ingreso Crédito
+public function ingresarCredito($idPedido, $efectivo)
+{
+	conectar::conexiones();
+	$efectivo=$this->filtroNumerico($this->normalizacionDeCaracteres($efectivo));
+	$idPedido=$this->filtroNumerico($idPedido);
+
+	//Ingreso el  crédito
+	$sql="UPDATE pedidos SET estado=2 WHERE id='".$idPedido."'";
+	mysql_query($sql);
+	$sql="INSERT INTO creditos SET idFactura='".$idPedido."', fechaAbono='".fechaActual."', estado=1";
+	if (mysql_query($sql)) {
+		# code...
+		$idCredito=mysql_insert_id();
+		if($efectivo>=0)
+		{
+			//Ingreso tirilla de abono
+			if($this->abonarACredito($idCredito, $efectivo)==1)
+			{
+				return 1;//ok
+			}
+			else
+			{
+				return 0;//Error
+			}	
+		}
+		//Actualizo el estado del pedido a  "en credito"
+		
+
+	}
+	conectar::desconectar();
+}
+
+
+//Ingreso tirilla de abono
+
+
+public  function abonarACredito($idCredito, $abono)
+{
+	conectar::conexiones();
+
+	//Verifico que el valor abonado sea menor al valor adeudado
+
+		//Procedo a abonar
+		$sql="INSERT INTO abonosCredito SET idCredito='".$this->filtroNumerico($idCredito)."',
+		fechaAbono='".fechaActual."',
+		valorAbono='".$this->filtroNumerico($this->normalizacionDeCaracteres($abono))."'";
+		if (mysql_query($sql)) {
+			# code...
+			return 1;
+		}
+		else
+		{
+			0;//Error
+		}
+
+
+
+	conectar::desconectar();
+}
+
+
+
+
+
+///Creo los clientees
+public  function crearCliente($parametros)
+{
+	conectar::conexiones();
+	extract($parametros);
+	$sql="INSERT INTO clientes SET
+	nombresApellidos='".$this->filtroStrings($nombresApellidos,2)."', 
+	identificacion='".$this->normalizacionDeCaracteres($this->filtroNumerico($identificacion))."',
+
+	telefonos='".$this->filtroStrings($telefonos, 1)."', email='".$this->filtrarEmail($email)."'";
+
+	if (mysql_query($sql)) {
+		# code...
+		return mysql_insert_id();
+	}
+	conectar::desconectar();
+}
+
+
+
+
+
+//Verificacion del cliente
+
+private function verificacionCliente($identificacion)
+{
+	conectar::conexiones();
+	$identificacion=$this->filtroNumerico($this->normalizacionDeCaracteres($identificacion));
+	$sql="SELECT id, identificacion FROM clientes  WHERE identificacion='".intval($identificacion)."'";
+	$query=mysql_query($sql);
+	if (mysql_num_rows($query)>0) {
+		# code...
+		$rs=mysql_fetch_array($query);
+		return $rs["id"];
+	}
+	else
+	{
+		return 0;
+	}
+	conectar::desconectar();
+}
 
 
 

@@ -9,25 +9,20 @@ class consultasAjax extends conectar {
 		conectar::conexiones();
 		if(isset($parametro))
 			{  
-				$sql="select * from contactos where identificacion='".$parametro."'";
+				$sql="select * from clientes where identificacion='".intval($parametro)."'";
 			    $res = mysql_query($sql) or die(mysql_error());
 			  	if($inf = mysql_fetch_array($res)){
-			    echo "formObj.nombre.value = '".$inf["nombre"]."';\n";   
-			    echo "formObj.direccion.value = '".$inf["direccion"]."';\n"; 
-			    echo "formObj.ciudad.value = '".$inf["ciudad"]."';\n";    
-			    echo "formObj.telefono.value = '".$inf["telefonos"]."';\n";    
+			    echo "formObj.nombresApellidos.value = '".$inf["nombresApellidos"]."';\n";   
+			    echo "formObj.telefonos.value = '".$inf["telefonos"]."';\n";    
 			    echo "formObj.email.value = '".$inf["email"]."';\n";
 			    echo "formObj.nuevoCliente.value = '".$inf["id"]."';\n";
-			    echo "formObj.regimenOld.value='".$inf["regimen"]."'";   
 			  }
 			  else{
-			    echo "formObj.nombre.value = '';\n";    
-			    echo "formObj.direccion.value = '';\n";
+			    echo "formObj.nombresApellidos.value = '';\n";    
 			    echo "formObj.ciudad.value = '';\n";    
-			    echo "formObj.telefono.value = '';\n";    
+			    echo "formObj.telefonos.value = '';\n";    
 			    echo "formObj.email.value = '';\n";
 			    echo "formObj.nuevoCliente.value = '0';\n";
-			    echo "formObj.regimenOld.value = 'no';\n";
 
 			  }
 

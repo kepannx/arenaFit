@@ -7,6 +7,6 @@ require("consultas.class.php");
 require("ingresar.class.php");
 require("editar.class.php");
 //require("informes.class.php");
-//require("consulta.ajax.class.php");
+require("consulta.ajax.class.php");
 //require("documentos.class.php");
 ?>
