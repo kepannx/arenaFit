@@ -4,9 +4,12 @@ $datos=$_REQUEST;
 extract($datos);
 $validar=new validar();
 $consulta= new consultas();
+$ingreso= new ingresos();
 $validar->validador($id);
-$ingresar= new ingresos();
 $datosUser=mysql_fetch_array($consulta->sqlEmpleado($id));
+$datosFactura=mysql_fetch_array($consulta->sqlFactura($f));
+$datosCliente=mysql_fetch_array($consulta->sqlCliente($consulta->encrypt($datosFactura["idCliente"], publickey)));
+
 $nombrePagina=nombreGeneral;
 ?>
 <!DOCTYPE html>
@@ -19,6 +22,7 @@ $nombrePagina=nombreGeneral;
     <script type="text/javascript" src="js/ajax.js"></script>
 
   <script type="text/javascript" src="ajax/autocompletar.js"></script>
+
 </head>
 
 <body>
@@ -38,7 +42,7 @@ require("../data/comunes/header.php");
   ?>
   <!-- Fin del Menú Lateral-->
 
-  <div class="mainpanel">
+  <div class="mainpanel" id="noPrint">
 
     <!--<div class="pageheader">
       <h2><i class="fa fa-home"></i> Dashboard</h2>
@@ -51,19 +55,17 @@ require("../data/comunes/header.php");
         <div class="col-md-12 col-lg-12 dash-left">
           <div class="col-md-12">
             <div class="panel">
-            <?php
-              # code...
-              require("../data/comunes/html/listas/items.php");
-          ?>
-        </div>
-        
-        <!-- Final del row-->
-
-
-
-            </div>
+            
+          <!-- Control de Envios-->
+            <?php 
+            
+               require("../data/comunes/html/ventas/datosFactura.php");
+            ?>
+          <!-- Fin Control de Envios
+          -->
+       
           </div>
-        
+
           <!-- panel -->
         
        
@@ -72,7 +74,8 @@ require("../data/comunes/header.php");
 
     
 
-       
+        
+
       </div><!-- row -->
 
     </div><!-- contentpanel -->
@@ -84,9 +87,15 @@ require("../data/comunes/header.php");
 
 <?php
 include("../data/comunes/js.php");
+if ($datosFactura["estado"]==2) {
+include("../data/comunes/html/ventas/abonos.php");
+}
 ?>
 <script src="js/auto.js"></script>
 
 <script src="../scripts/ui/jquery-ui.min.js"></script>
+
+
+
 </body>
 </html>

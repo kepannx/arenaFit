@@ -7,7 +7,52 @@ class ingresos extends conectar {
 //FILTER_SANITIZE_STRING
 
 
+public  function datospedido($id, $vector)
+{
+	conectar::conexiones();
+	$id=$this->decrypt($id, publickey);
+	$sql="SELECT * FROM pedidos WHERE id='".$id."'";
+	$query=mysql_query($sql);
+	$rs=mysql_fetch_array($query);
+	switch ($vector) {
+		case 'nroPedido':
+			# code...
+			return $rs["nroPedido"];
+			break;
 
+		case 'idCliente':
+			# code...
+			return $rs["idCliente"];
+			break;
+
+		case 'idVendedor':
+			# code...
+			return $rs["idVendedor"];
+			break;
+
+		case 'fechaPedido':
+			# code...
+			return $rs["fechaPedido"];
+			break;
+
+		case 'valorPedido':
+			# code...
+			return $rs["valorPedido"];
+			break;
+
+		case 'estado':
+			# code...
+			return $rs["estado"];
+			break;
+		
+		default:
+			# code...
+			break;
+	}
+	conectar::desconectar();
+
+
+}
 
 
 
@@ -73,7 +118,7 @@ public  function ingresarPedidos($parametros)
         $control=0;
         $suma=0;
         $sql="INSERT INTO pedidos SET nroPedido='".$this->consecutivoNroPedido()."', 
-        idCliente=1, idVendedor='".$this->decrypt($id, publickey)."', fechaPedido='".fechaActual."',
+        idCliente=".$this->filtroNumerico($idCliente).", idVendedor='".$this->decrypt($id, publickey)."', fechaPedido='".fechaActual."',
         valorPedido='".$this->filtroNumerico($this->normalizacionDeCaracteres($valorTotal))."'
         ";
         mysql_query($sql);
@@ -114,7 +159,7 @@ public function ingresarCredito($idPedido, $efectivo)
 	$idPedido=$this->filtroNumerico($idPedido);
 
 	//Ingreso el  crédito
-	$sql="UPDATE pedidos SET estado=2 WHERE id='".$idPedido."'";
+	$sql="UPDATE pedidos SET estado=2, debe='".$this->datospedido($this->encrypt($idPedido, publickey), "valorPedido")."'  WHERE id='".$idPedido."'";
 	mysql_query($sql);
 	$sql="INSERT INTO creditos SET idFactura='".$idPedido."', fechaAbono='".fechaActual."', estado=1";
 	if (mysql_query($sql)) {
@@ -125,6 +170,8 @@ public function ingresarCredito($idPedido, $efectivo)
 			//Ingreso tirilla de abono
 			if($this->abonarACredito($idCredito, $efectivo)==1)
 			{
+				$sql="UPDATE pedidos SET debe='".($this->datospedido($this->encrypt($idPedido, publickey), "valorPedido")-$efectivo)."'  WHERE id='".$idPedido."'";
+				mysql_query($sql);
 				return 1;//ok
 			}
 			else
@@ -150,11 +197,13 @@ public  function abonarACredito($idCredito, $abono)
 	//Verifico que el valor abonado sea menor al valor adeudado
 
 		//Procedo a abonar
+		
 		$sql="INSERT INTO abonosCredito SET idCredito='".$this->filtroNumerico($idCredito)."',
 		fechaAbono='".fechaActual."',
 		valorAbono='".$this->filtroNumerico($this->normalizacionDeCaracteres($abono))."'";
 		if (mysql_query($sql)) {
 			# code...
+
 			return 1;
 		}
 		else
@@ -215,18 +264,19 @@ private function verificacionCliente($identificacion)
 
 
 
-private  function consecutivoNroPedido()
+public  function consecutivoNroPedido()
 {
 	conectar::conexiones();
 	$sql="SELECT MAX(nroPedido) FROM pedidos";
 	 $rs=mysql_fetch_array(mysql_query($sql));
-	 if ($rs["nroPedido"]==NULL) {
+	 
+	 if ($rs[0]==NULL) {
 	 	# code...
 	 	return 1;
 	 }
 	 else
 	 {
-	 	return $rs["nroPedido"]+1;
+	 	return $rs[0]+1;
 	 }
 	conectar::desconectar();
 }

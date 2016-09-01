@@ -21,7 +21,7 @@
     
     <div class="col-md-6">
       <div class="btn btn-success" style="width:100%; font-size:20px;">
-        <h4 class="panel-title" style="color:#fff;">Registro En Caja</h4>
+        <h4 class="panel-title" style="color:#fff;">Registro En Efectivo</h4>
         <?php echo '$'.number_format($consulta->registroEnCajadelDia($vector)); ?>
       </div>
     </div>
@@ -30,7 +30,7 @@
     <div class="col-md-6">
       <div class="btn btn-danger" style="width:100%; font-size:20px;">
         <h4 class="panel-title" style="color:#fff;">Lo que hay en registrado en crédito hoy</h4>
-        <?php echo $consulta->valorCreditos(1) ?>
+        <?php echo "$ ".number_format($consulta->valorCreditosDia(NULL)); ?>
       </div>
     </div>
 

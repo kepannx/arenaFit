@@ -7,6 +7,9 @@ $consulta= new consultas();
 $ingreso= new ingresos();
 $validar->validador($id);
 $datosUser=mysql_fetch_array($consulta->sqlEmpleado($id));
+$datosFactura=mysql_fetch_array($consulta->sqlFactura($f));
+$datosCliente=mysql_fetch_array($consulta->sqlCliente($consulta->encrypt($datosFactura["idCliente"], publickey)));
+
 $nombrePagina=nombreGeneral;
 ?>
 <!DOCTYPE html>
@@ -55,7 +58,8 @@ require("../data/comunes/header.php");
             
           <!-- Control de Envios-->
             <?php 
-               require("../data/comunes/html/ventas/registroCreditos.php");
+            
+               require("../data/comunes/html/ventas/datosFactura.php");
             ?>
           <!-- Fin Control de Envios
           -->
@@ -83,8 +87,9 @@ require("../data/comunes/header.php");
 
 <?php
 include("../data/comunes/js.php");
-include("../data/comunes/html/ventas/filtroFechas.php");
-include("../data/comunes/html/ventas/filtroCreditos.php");
+if ($datosFactura["estado"]==2) {
+include("../data/comunes/html/ventas/abonos.php");
+}
 ?>
 <script src="js/auto.js"></script>
 

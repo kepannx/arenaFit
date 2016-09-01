@@ -14,6 +14,28 @@ class consultas extends conectar {
     conectar::desconectar();
   }
 
+
+
+//datos del pedido
+  public function sqlFactura($id) {
+    conectar::conexiones();
+    $id=$this->decrypt($id, publickey);
+    $sql = "SELECT * FROM  pedidos  where id='".$id."'";
+    return mysql_query($sql, $this->conexion);
+    conectar::desconectar();
+  }
+
+
+
+  //datos del pedido
+  public function sqlCliente($id) {
+    conectar::conexiones();
+    $id=$this->decrypt($id, publickey);
+    $sql = "SELECT * FROM  clientes  where id='".$id."'";
+    return mysql_query($sql, $this->conexion);
+    conectar::desconectar();
+  }
+
 /*
   public function sqlImpuestos($id) {
     conectar::conexiones();
@@ -221,6 +243,11 @@ public  function datosFactura($idFactura, $vector)
     case 'valorPedido':
       # code...
       return $rs["valorPedido"];
+      break;
+
+    case 'debe':
+      # code...
+      return $rs["debe"];
       break;
 
 
@@ -555,14 +582,6 @@ public  function factura($idFactura, $vector)
 
 
 
-public  function valorCreditos()
-{
-
-}
-
-
-
-
 
 
 
@@ -616,6 +635,7 @@ elseif ($vector==3) {
   echo '<table id="dataTable1" class="table table-bordered table-striped-col">
               <thead>
                 <tr>
+                  <th>Estado</th>
                   <th>Nro Factura</th>
                   <th>Cliente</th>
                   <th>Fecha</th>
@@ -629,8 +649,9 @@ elseif ($vector==3) {
 while ($rs=mysql_fetch_array($query)) {
   # code...
   echo '<tr>
+                  <td>'.$this->stringEstado($rs["estado"]).'</td>
                   <td>'.$rs["nroPedido"].'</td>
-                  <td>'.$rs["idCliente"].'</td>
+                  <td>'.$this->datosCliente($rs["idCliente"], "nombresApellidos").'</td>
                   <td>'.$this->fechaHumana(date("Y-m-d", $rs["fechaPedido"])).'</td>
                   <td>$'.number_format($rs["valorPedido"]).'</td>
 
@@ -658,45 +679,81 @@ echo '</tbody>
 public  function listaCreditos($id, $vector)
 {
 
+  conectar::conexiones();
+
 //[1]:Ventas del día actual [2]:Ventas del mes [3]:Fecha Seleccionada
 if ($vector==1) {
   # code...
-  $sql="SELECT *  FROM creditos  WHERE fechaAbono BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)." ";
-  $query=mysql_query($sql);
+  $sql="SELECT *  FROM creditos  WHERE fechaAbono BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)."  ";
+
+  
 }
 elseif ($vector==2) {
   # code...
   //$sql="SELECT *  FROM pedidos WHERE fechaPedido BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)." ";
+   $sql="SELECT *  FROM pedidos  WHERE  estado !=1";
+
+
 }
 elseif ($vector==3) {
   # code...
   $fecha1=strtotime($_REQUEST["fecha1"]);
   $fecha2=strtotime($_REQUEST["fecha2"]);
-  $sql="SELECT *  FROM pedidos WHERE fechaAbono BETWEEN ".$fecha1."  AND ".$fecha2."";
-  $query=mysql_query($sql);
+  $sql="SELECT *  FROM pedidos WHERE fechaPedido BETWEEN ".$fecha1."  AND ".$fecha2." and  estado !=1";
+
 
 }
 
+elseif ($vector==4) {
+  # code...
+  //Miro el campo
+  $campo=$this->filtroNumerico($_REQUEST["campo"]);
+  if ($campo==2) {
+    # identificacion del cliente...
+  $parametro=$this->normalizacionDeCaracteres($this->filtroNumerico($_REQUEST["parametro"]));
+  $sqlCliente="SELECT id, identificacion FROM clientes WHERE identificacion='".intval($parametro)."'";
+  $queryCliente=mysql_query($sqlCliente);
+  $rsCliente=mysql_fetch_array($queryCliente);
+  $parametro=$rsCliente["id"];
+  $sql="SELECT *  FROM pedidos  WHERE idCliente ='".intval($parametro)."' AND estado !=1";
+  
+
+  }
+  elseif ($campo==3) {
+    # numero de factura...
+  $parametro=$this->normalizacionDeCaracteres($this->filtroNumerico($_REQUEST["parametro"]));
+  $sql="SELECT *  FROM pedidos  WHERE nroPedido ='".intval($parametro)."' AND estado !=1";
+
+  }
+
+
+
+}
   echo '<table id="dataTable1" class="table table-bordered table-striped-col">
               <thead>
                 <tr>
                   <th>Nro Factura</th>
                   <th>Cliente</th>
+                  <th>Identificacion</th>
                   <th>Fecha</th>
                   <th>Valor Factura</th>
+                  <th>Deuda</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>';
 
-
+  $query=mysql_query($sql);
+  $sum=0;
 while ($rs=mysql_fetch_array($query)) {
   # code...
   echo '<tr>
-                  <td>'.$this->datosFactura($rs["idFactura"], "nroPedido").'</td>
-                  <td>'.$this->datosCliente($this->datosFactura($rs["idFactura"], "idCliente"), "nombresApellidos").'</td>
-                  <td>'.$this->fechaHumana(date("Y-m-d", $this->datosFactura($rs["idFactura"], "fechaPedido"))).'</td>
-                  <td>$'.number_format($this->datosFactura($rs["idFactura"], "valorPedido")).'</td>
+                  <td>'.$rs["nroPedido"].'</td>
+                  <td align="center">'.$this->datosCliente($rs["idCliente"], "nombresApellidos").'</td>
+                   <td align="center">'.$this->datosCliente($rs["idCliente"], "identificacion").'</td>
+                  <td align="center">'.$this->fechaHumana(date("Y-m-d",$rs["fechaPedido"])).'</td>
+                  <td align="center">$'.number_format($rs["valorPedido"]).'</td>
+                  <td align="center">$'.number_format($rs["debe"]).'</td>
 
                   <td>
                     <a href="'.$this->datospagina(5).'/ventas/detalleFactura.php?id='.$id.'&f='.$this->encrypt($rs["id"], publickey).'" >
@@ -704,12 +761,23 @@ while ($rs=mysql_fetch_array($query)) {
                     </a>
                       </td>
                 </tr>';
+
+                $sum=$sum+$rs["debe"];
 }
 
 echo '</tbody>
-    </table>';
+    </table>
+    
+
+    ';
+
+    echo '<br><hr>
+    <div class="col-md-12">
+      '.$this->avisos("error", "Total en Créditos: <h1 style='color:#fff'> $ ".number_format($sum)."</h1>").'
+    </div>';
 
 
+    conectar::conexiones();
 }
 
 //Valor de lo vendido hoy
@@ -719,7 +787,7 @@ public  function registroEnCajadelDia($vector)
   conectar::conexiones();
   if(!isset($vector))
   {
-      $sql="SELECT *  FROM pedidos  WHERE fechaPedido BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)." ";
+      $sql="SELECT *  FROM pedidos  WHERE fechaPedido BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)."  AND liquidado =1";
 
   }
   else
@@ -728,7 +796,7 @@ public  function registroEnCajadelDia($vector)
       # code...
       $fecha1=strtotime($_REQUEST["fecha1"]);
       $fecha2=strtotime($_REQUEST["fecha2"]);
-      $sql="SELECT *  FROM pedidos WHERE fechaPedido BETWEEN ".$fecha1."  AND ".$fecha2."";
+      $sql="SELECT *  FROM pedidos WHERE fechaPedido BETWEEN ".$fecha1."  AND ".$fecha2." AND liquidado =1";
 
     }
   }
@@ -736,13 +804,186 @@ public  function registroEnCajadelDia($vector)
   $sum=0;
   while ($rs=mysql_fetch_array($query)) {
     # code...
-    $sum=$sum+$rs["valorPedido"];
+    $sum=$sum+($rs["valorPedido"]-$rs["debe"]);
   }
 
 
    return  $sum;
   conectar::desconectar();
 }
+
+
+
+
+//RValor  de lo que se ha dado en credito hoy
+
+public  function valorCreditosDia($parametro)
+{
+  conectar::conexiones();
+  $sql="SELECT debe, estado, liquidado FROM pedidos  WHERE fechaPedido BETWEEN ".fechaActualFija."  AND ".(fechaActualFija+86400)."  AND liquidado =1 AND estado=2";
+  $query=mysql_query($sql);
+  $sum=0;
+  while ($rs=mysql_fetch_array($query)) {
+    # code...
+    $sum=$sum+($rs["debe"]);
+  }
+
+  return $sum;
+  conectar::desconectar();
+}
+
+
+/*************************Cajas**************************/
+
+public  function menuListaCaja($id)
+{
+
+  conectar::conexiones();
+  $sql="SELECT * FROM cajas";
+  $query=mysql_query($sql);
+  echo '<ul class="children">';
+  while ($rs=mysql_fetch_array($query)) {
+    # code...
+    echo '<li><a href="'.$this->datospagina(5).'/cajas/caja.php?id='.$id.'&idCaja='.$this->encrypt($rs["id"], publickey).'">'.$rs["nombreCaja"].'</a> </li>';
+  }
+  echo '</ul>';
+  conectar::desconectar();
+}
+
+
+
+
+
+
+//Abonos
+
+public  function abonos($idfactura, $abono)
+{
+  conectar::conexiones();
+  $idFactura=$this->decrypt($_REQUEST["f"], publickey);
+  $abono=$this->filtroNumerico($this->normalizacionDeCaracteres($abono));
+
+  $deuda=$this->datosFactura($idFactura, "debe");
+  $deudaFinal=($deuda - $abono);
+  //Inserto el subitem
+  
+  /*
+  echo "<br>id Factura: ".$idFactura;
+  echo "<br>Abono: ".$abono;
+  echo "<br>Deuda: ".$deuda;
+  echo "<br>Deuda Final:".$deudaFinal;
+  */
+  $sql="insert into itemsPedido SET nombreArticulo='Abono de credito a factura ".$this->datosFactura($idFactura, "nroPedido")."',
+
+    valorUnidad='".intval($abono)."', idPedido='".intval($idPedido)."'";
+
+    if (mysql_query($sql)) {
+      # code...
+      if($deudaFinal<=0)//convesión del estado y  deuda final
+            {
+              $estado=1;  //Canceló
+              $deudaFinal=0;
+            }
+            else
+            {
+              $estado=2; //Aun debe
+            }//fin de la convesión del estado y  deuda final
+      
+       $sqlPedidos="UPDATE pedidos SET debe='".$deudaFinal."', estado='".$estado."' WHERE id='".intval($idFactura)."'";
+      if (mysql_query($sqlPedidos)) {
+
+        # code...
+        $sql="SELECT id, idFactura FROM creditos where idFactura='".intval($idFactura)."'";
+        $rs=mysql_fetch_array(mysql_query($sql));
+        $idCredito=$rs["id"];
+
+        $sqlCredito="INSERT INTO abonosCredito SET idCredito='".intval($idCredito)."', fechaAbono='".fechaActualFija."', valorAbono='".intval($abono)."'";
+        if (mysql_query($sqlCredito)) {
+          # code...
+          return 1;//Abono Hecho correctamente;
+
+        } 
+        else{
+          return 0; //Error
+        }
+
+      
+
+      }
+         echo mysql_error();
+
+    }
+
+
+
+conectar::desconectar();
+
+}
+
+
+
+
+//Lista de los abonos
+
+public  function listaDeAbonos($idFactura)
+{
+  conectar::conexiones();
+  $idFactura=$this->filtroNumerico($idFactura);
+
+  $sql="SELECT id, idFactura FROM creditos WHERE  idFactura='".intval($idFactura)."'";
+  $query=mysql_query($sql);
+  $rsCredito=mysql_fetch_array($query);
+
+  $sql="SELECT idCredito, fechaAbono, valorAbono FROM abonosCredito WHERE idCredito='".$rsCredito["id"]."'";
+  $query=mysql_query($sql);
+
+  echo '
+        <div class="col-md-12">
+                  <h3><i class="fa fa-file"></i> Abonos Realizados</h3>
+
+
+  <table class="table table-bordered table-primary nomargin" id="noPrint">
+                  <thead>
+                    <tr>  
+                      <th class="text-center">Fecha Abono</th>
+                      <th class="text-center">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>';
+    
+
+    //ciclo
+    $sum=0;
+    while ($rs=mysql_fetch_array($query)) {
+            # code...
+        echo ' <tr>
+                      <td class="text-center">'.$this->fechaHumana(date("Y-m-d", $rs["fechaAbono"])).'</td>
+                      <td class="text-center">$'.number_format($rs["valorAbono"]).'</td>
+                    </tr>';
+          
+          $sum=$sum+$rs["valorAbono"];
+          }
+
+
+
+  //fin del ciclo
+
+    echo '      <tbody>
+          </table>
+    <div class="row" id="noPrint">
+        <div class="col-md-12">
+          <h1 align="center" class="text-danger">Total Abonado <i>$ '.number_format($sum).'</i></h1>
+        </div>
+        </div>
+</div>
+    ';
+
+
+  conectar::desconectar();
+}
+
+
+
 
 
 
@@ -896,6 +1137,29 @@ public  function stringTipoContrato($parametro)
       break;
   }
 }
+
+//String Estados
+
+public  function stringEstado($vector)
+{
+  switch ($vector) {
+    case 1:
+      return "<p class='text-success'><i class='fa fa-check'></i> Cancelado</p>";
+      # code...
+      break;
+
+    case 2:
+      return "<p class='text-danger'><i class='fa fa-warning'></i>  Crédito</p>";
+      # code...
+      break;
+    
+    default:
+      # code...
+      break;
+  }
+}
+
+
 
 
 public  function stringBodega($parametro)

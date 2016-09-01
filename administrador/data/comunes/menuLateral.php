@@ -34,7 +34,7 @@
 
               </ul>
             </li>
-
+    
              <li class="nav-parent">
               <a href=""><i class="fa fa-suitcase"></i> <span>Productos</span></a>
               <ul class="children">
@@ -43,8 +43,16 @@
               
               </ul>
             </li>
+  <!-- 
+            <li class="nav-parent">
+              <a href=""><i class="fa fa-box"></i> <span>Cajas</span></a>
+                
+              <?php
+                 // $consulta->menuListaCaja($id);
+              ?>
+            </li>
 
-
+  -->
 
 
           </ul>

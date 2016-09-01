@@ -81,7 +81,7 @@
             <div class="btn-group">
               <button type="button" class="btn btn-logged" data-toggle="dropdown">
                 <img src="<?php echo $validar->datospagina(5); ?>images/photos/loggeduser.png" alt="" />
-                <?php echo $consulta->filtroStrings($datosUser["nombre"],2); ?>
+                <?php echo $consulta->filtroStrings($datosUser["nombres"],2); ?>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu pull-right">

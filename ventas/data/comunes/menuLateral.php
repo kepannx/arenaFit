@@ -10,8 +10,8 @@
           </a>
         </div>
         <div class="media-body">
-          <h4 class="media-heading"><?php echo $consulta->filtroStrings($datosUser["nombre"],2); ?> </h4>
-          <span>Administrador</span>
+          <h4 class="media-heading"><?php echo $consulta->filtroStrings($datosUser["nombres"],2); ?> </h4>
+          <span>Vendedor</span>
         </div>
       </div><!-- leftpanel-profile -->
 
@@ -34,7 +34,7 @@
 
               </ul>
             </li>
-
+    
              <li class="nav-parent">
               <a href=""><i class="fa fa-suitcase"></i> <span>Productos</span></a>
               <ul class="children">
@@ -43,8 +43,16 @@
               
               </ul>
             </li>
+  <!-- 
+            <li class="nav-parent">
+              <a href=""><i class="fa fa-box"></i> <span>Cajas</span></a>
+                
+              <?php
+                 // $consulta->menuListaCaja($id);
+              ?>
+            </li>
 
-
+  -->
 
 
           </ul>

@@ -84,6 +84,7 @@ require("../data/comunes/header.php");
 <?php
 include("../data/comunes/js.php");
 include("../data/comunes/html/ventas/filtroFechas.php");
+include("../data/comunes/html/ventas/filtroCreditos.php");
 ?>
 <script src="js/auto.js"></script>
 
